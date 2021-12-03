@@ -35,6 +35,7 @@ function accurateWait(){
 
     var divInt = Math.floor(time/iterations);
     var divRemainder = (time/iterations) % 1;
+  console.log('Worker: Going to sleep for ' + time);
 
     accuTime( divInt, iterations, () => {
     setTimeout(function(){
