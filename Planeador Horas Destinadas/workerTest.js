@@ -32,6 +32,7 @@ function accurateWait(){
     //Fazer o calculo para saber quantos milisegundos por amostra
     var iterations = 3000;
     var time = waitTime;//getWaitTime();
+  console.log('Going to wait accurate ' + time + ' miliseconds');
 
     var divInt = Math.floor(time/iterations);
     var divRemainder = (time/iterations) % 1;
