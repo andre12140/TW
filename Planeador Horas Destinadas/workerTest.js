@@ -38,6 +38,7 @@ function accurateWait(){
 
     accuTime( divInt, iterations, () => {
     setTimeout(function(){
+      console.log('Worker: Send Attack');
         postMessage(0);
         return
     },Math.round(divRemainder*iterations));});
@@ -48,7 +49,6 @@ function accurateWait(){
 onmessage = function(event) {
   
   console.log('From Main: ' + event.data);
-  console.log(typeof parseInt(event.data[1]));
   
   if(event.data[0] == 1){
     waitTime = event.data[1];
