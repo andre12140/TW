@@ -32,10 +32,11 @@ function accurateWait(){
     //Fazer o calculo para saber quantos milisegundos por amostra
     var iterations = 3000;
     var time = waitTime;//getWaitTime();
+  console.log('Worker: Going to sleep for ' + time);
 
     var divInt = Math.floor(time/iterations);
     var divRemainder = (time/iterations) % 1;
-  console.log('Worker: Going to sleep for ' + time);
+  
 
     accuTime( divInt, iterations, () => {
     setTimeout(function(){
