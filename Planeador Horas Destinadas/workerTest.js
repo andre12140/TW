@@ -48,7 +48,7 @@ function accurateWait(){
 onmessage = function(event) {
   
   console.log('From Main: ' + event.data);
-  console.log(typeof event.data[1]);
+  console.log(typeof parseInt(event.data[1]));
   
   if(event.data[0] == 1){
     waitTime = event.data[1];
