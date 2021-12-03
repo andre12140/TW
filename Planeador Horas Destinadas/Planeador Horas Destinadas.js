@@ -6,6 +6,7 @@
 // @author       Barb
 // @include      https://*screen=place&try=confirm*
 // @icon         https://i.imgur.com/p9B7h1l.png
+// @grant        GM_xmlhttpRequest
 // @run-at       document-start
 // ==/UserScript==
 
@@ -13,26 +14,15 @@ var badJStimeDelay = 3200;
 
 var attackDuration;
 
+var url = "https://raw.githubusercontent.com/andre12140/TW/main/Planeador%20Horas%20Destinadas/workerTest.js";
+var dataURL;
+
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 function aleatorio(menor, maior) {
     var intervalo = Math.round(maior - menor);
     return Math.floor(Math.random() * intervalo) + menor + Timing.offset_to_server;
 }
-
-
-var workerScript = "data:text/javascript," +
-    "self.onmessage = function(e) {" +
-    "    console.log(e.data);" +
-    "    self.postMessage('Worker is sending this message');" +
-    "};" +
-    "console.log('Starting Worker');" +
-    "var timeStart = new Date();" +
-    "setTimeout(function(){" +
-    "    console.log('Worker: ' + Date.now() - timeStart)" +
-    "}, 60000);"
-
-
 
 function accuTime(timer, max, callbackArgument){
   var counter = 1;
@@ -75,14 +65,14 @@ function accurateWait(offSet){
 
     accuTime( divInt, iterations, () => {
     setTimeout(function(){
-        $('#troop_confirm_submit').click();
+        //$('#troop_confirm_submit').click();
         console.log('///////////////// SENDING ATTACK //////////////////');
         return
     },Math.round(divRemainder*iterations));});
 }
 
 //TODO: Use web workers to have priority if in background task
-function ButtonClickAction () {
+function ButtonClickAction (worker) {
     document.getElementById ('CSbutton').removeEventListener ("click", ButtonClickAction, false);
     $('#CSbutton').addClass('btn-disabled');
     $('#troop_confirm_submit').addClass('btn-disabled');
@@ -93,14 +83,23 @@ function ButtonClickAction () {
 
     //TODO: Criar um worker no github e enviar o waitTime e offset
 
-    if(waitTime > 0){
-        console.log('Going to sleep but waking up 1 min before due date');
-        setTimeout(function(){
-            accurateWait(offSet);
-        }, waitTime);
-    } else {
-        accurateWait(offSet);
-    }
+    //Wait for worker to complete and send Attack
+    // postMessage; 0 -> Send Attack; 1 -> get Waiting Time;
+    worker.addEventListener('message', function(e) {
+        if(e.data == 0){
+            $('#troop_confirm_submit').click();
+            console.log('///////////////// SENDING ATTACK //////////////////');
+            return
+        } else if(e.data == 1){
+            worker.postMessage([1, getWaitTime(offSet)]);
+        }
+    }, false);
+
+    worker.postMessage([1, getWaitTime(offSet)]);
+}
+
+function callback(worker){
+
 }
 
 setTimeout(async function() {
@@ -116,25 +115,27 @@ setTimeout(async function() {
 
     await delay(aleatorio(100,200));
 
-    /*var worker = new unsafeWindow.Worker( workerScript);
-
-    worker.postMessage([1,2,3]);
-
-    worker.addEventListener('message', function(e) {
-        console.log(e.data);
-    }, false);
-
-    var timeStart = new Date();
-    setTimeout(function(){
-        console.log('Main: ' + Date.now() - timeStart)
-    }, 60000);*/
-
     document.getElementById('CStime').value = defaultTimeDate.toISOString().replace('Z','');
     document.getElementById('CSoffset').value = 0; //Timing.offset_to_server
 
-
-    //--- Activate the newly added button.
-    document.getElementById ('CSbutton').addEventListener ("click", ButtonClickAction, false);
+    await GM_xmlhttpRequest({
+        method: 'GET',
+        url: url,
+        onload: function(response) {
+            var script, dataURL, worker = null;
+            if (response.status === 200) {
+                console.log('Worker script loaded succsuccessfully');
+                script = response.responseText;
+                dataURL = 'data:text/javascript;base64,' + btoa(script);
+                worker = new unsafeWindow.Worker(dataURL);
+                //--- Activate the newly added button.
+                document.getElementById ('CSbutton').addEventListener ("click", function(){ButtonClickAction(worker)}, false);
+            }
+        },
+        onerror: function() {
+            console.log('ON ERROR');
+        }
+    });
 
 }, 200);
 
