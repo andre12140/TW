@@ -51,6 +51,7 @@ onmessage = function(event) {
   
   if(event.data[0] == 1){
     waitTime = event.data[1];
+    console.log('Waiting Time: ' + waitTime);
   }
   if(started == 0){
     started = 1;
