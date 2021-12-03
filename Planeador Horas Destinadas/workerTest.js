@@ -66,5 +66,3 @@ onmessage = function(event) {
   }
 }
 
-postMessage(1);
-
