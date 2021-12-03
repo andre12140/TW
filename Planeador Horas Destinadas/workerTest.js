@@ -56,7 +56,7 @@ onmessage = function(event) {
   }
   if(started == 0){
     started = 1;
-    if(waitTime > 0){
+    if(waitTime - (60000 * 1) > 0){
         console.log('Going to sleep but waking up 1 min before due date');
         setTimeout(function(){
             accurateWait();
