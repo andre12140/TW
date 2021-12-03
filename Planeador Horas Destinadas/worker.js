@@ -1,6 +1,6 @@
 onmessage = function(event) {
-  postMessage(event.data);
-  onCancel(); // causes "onCancel is not defined" error
+  postMessage('Worker Message');
+  //onCancel(); // causes "onCancel is not defined" error
 }
 
 
