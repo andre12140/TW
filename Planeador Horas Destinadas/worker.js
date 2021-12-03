@@ -1,4 +1,5 @@
 onmessage = function(event) {
+  console.log('Worker Recived Message');
   postMessage('Worker Message');
   //onCancel(); // causes "onCancel is not defined" error
 }
